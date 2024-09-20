@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Encryption and Decryption</title>
+    <head>
+        <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    </head>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .image-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px;
+        }
+        .image-container img {
+            margin: 10px;
+            width: 300px;
+            height: 300px;
+        }
+        button {
+            margin: 20px;
+            padding: 10px;
+            font-size: 18px;
+            background-color: orange;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Image Encryption and Decryption</h1>
+    
+    <input type="file" id="imageInput" accept="image/*"><br>
+    
+    <div class="image-container">
+        <div>
+            <h2>Original Image</h2>
+            <img id="originalImage" src="" alt="Original Image">
+        </div>
+        <div>
+            <h2>Encrypted/Decrypted Image</h2>
+            <img id="processedImage" src="" alt="Processed Image">
+        </div>
+    </div>
+    
+    <button onclick="encryptImage()">Encrypt</button>
+    <button onclick="decryptImage()">Decrypt</button>
+    <button onclick="resetImage()">Reset</button>
+
+    <script>
+        let originalImage;
+        let processedImage;
+
+        // Handle image upload
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                originalImage = e.target.result;
+                document.getElementById('originalImage').src = originalImage;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Encrypt image using basic pixel manipulation
+        function encryptImage() {
+            fetch('/encrypt', {
+                method: 'POST',
+                body: JSON.stringify({ image: originalImage }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('processedImage').src = data.encrypted_image;
+            });
+        }
+
+        // Decrypt image using basic pixel manipulation
+        function decryptImage() {
+            fetch('/decrypt', {
+                method: 'POST',
+                body: JSON.stringify({ image: processedImage }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('processedImage').src = data.decrypted_image;
+            });
+        }
+
+        // Reset image to original
+        function resetImage() {
+            document.getElementById('processedImage').src = originalImage;
+        }
+    </script>
+</body>
+</html>
